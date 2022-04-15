@@ -1,8 +1,8 @@
-import { CreateFolderDto, UpdateFolderDto } from '../models/folder.dto';
+import { CreateFolderDto, UpdateFolderDto } from '../models/folder/folder.dto';
 import { HttpException, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FolderEntity } from '../models/folder.entity';
+import { FolderEntity } from '../models/folder/folder.entity';
 import { IOHelper } from './../helpers/io.helper';    
 
 @Injectable()

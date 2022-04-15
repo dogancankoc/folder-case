@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { FolderModule } from 'src/folder/folder.module';
+import { ImageModule } from 'src/image/image.module';
 
 
 @Module({
@@ -17,9 +18,9 @@ import { FolderModule } from 'src/folder/folder.module';
       autoLoadEntities: true,
       synchronize: true
     }),
-    FolderModule]
+    FolderModule, ImageModule]
   //controllers: [folderController],
   //providers: [folderService]
-  //exports : [] bu alanı anlamadım neyi neden export ediyoruz
+  //exports : []
 })
 export class AppModule { }

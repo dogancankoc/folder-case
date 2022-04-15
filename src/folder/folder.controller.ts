@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Put, Param, Body, ParseUUIDPipe, Delete } from "@nestjs/common"
 import { FolderService } from "./folder.service"
-import { CreateFolderDto, UpdateFolderDto } from "../models/folder.dto"
+import { CreateFolderDto, UpdateFolderDto } from "../models/folder/folder.dto"
 
 @Controller('folder') 
 export class FolderController {
