@@ -39,4 +39,16 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
+## Yapılacaklar
+```
+--1-) Folder update işleminde folder taşındığında folderPath'i ve mpath'i güncelleyebiliyoruz,
+     içerisindeki resimlerle beraber güncellendiği parentFolder'a taşınıyor.
+    taşıma işlemi yapılan folder'ın path'i güncelleniyor ancak içerisindeki image'lerin mpath'leri
+    güncelleniyor ama pathleri güncellenmiyor. Yada içerisinde başka folder varsa yada o folder'ın içinde başka iç içe
+    geçmiş folderlar mpath'leri güncelleniyor. image'lerin mpath ve Path'leri güncellenmiyor. 
+        Kısaca iç içe geçmiş folderların ve içerisinde resim bulunan iç içe geçmiş folder'ların ve içerisindeki
+        image'lerin path'leri güncellenecek
+```
+
+
 Nest is [MIT licensed](LICENSE).
