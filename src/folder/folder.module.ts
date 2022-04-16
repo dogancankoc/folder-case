@@ -11,7 +11,8 @@ import { IOHelper } from './../helpers/io.helper';
         TypeOrmModule.forFeature([FolderEntity])
     ],
     controllers: [FolderController],
-    providers:[FolderService, IOHelper]
+    providers:[FolderService, IOHelper],
+    exports: [FolderService]
 })
 export class FolderModule implements NestModule{
     configure(consumer: MiddlewareConsumer) {

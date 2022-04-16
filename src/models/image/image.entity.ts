@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn, Tree, TreeChildren, TreeParent, DeleteDateColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, Tree, TreeChildren, TreeParent, DeleteDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { FolderEntity } from '../folder/folder.entity';
 
 
 @Entity('image')
@@ -8,11 +9,17 @@ export class ImageEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
+  @Column("uuid")
+  folderId: string;
+
   @Column({ nullable: true })
   imageName: string;
 
   @Column()
-  imageFolder: string;
+  imagePath: string;
+
+  @Column()
+  imageProperties: string;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
@@ -37,6 +44,10 @@ export class ImageEntity {
 
   @TreeParent()
   parent: ImageEntity;
+
+  @ManyToOne(() => FolderEntity, folder => folder.id)
+  @JoinColumn()
+  folder: FolderEntity
 
 }
 /*

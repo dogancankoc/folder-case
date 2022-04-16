@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn, Tree, TreeChildren, TreeParent, DeleteDateColumn } from 'typeorm';
+import { Exclude } from 'class-transformer';
+import { Column, Entity, PrimaryGeneratedColumn, Tree, TreeChildren, TreeParent, DeleteDateColumn, OneToMany, JoinColumn } from 'typeorm';
+import { ImageEntity } from '../image/image.entity';
 
 
 @Entity('folder')
@@ -14,21 +16,27 @@ export class FolderEntity {
   @Column({ default: "" })
   folderPath: string;
 
+  @Exclude()
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
+  @Exclude()
   @Column({ type: 'timestamp', nullable: true })
   updatedAt: Date;
 
+  @Exclude()
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date;
 
+  @Exclude()
   @Column({ nullable: true })
   createdBy: string;
 
+  @Exclude()
   @Column({ nullable: true })
   updatedBy: string;
 
+  @Exclude()
   @Column({ nullable: true })
   deletedBy: string;
 
@@ -37,5 +45,9 @@ export class FolderEntity {
 
   @TreeParent()
   parent: FolderEntity;
+
+  @OneToMany(() => ImageEntity, image => image.folderId)
+  @JoinColumn()
+  images: ImageEntity[];
 
 }

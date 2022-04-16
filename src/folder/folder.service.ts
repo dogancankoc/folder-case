@@ -1,21 +1,27 @@
 import { CreateFolderDto, UpdateFolderDto } from '../models/folder/folder.dto';
 import { HttpException, Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { TreeRepository, getConnection, SelectQueryBuilder } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FolderEntity } from '../models/folder/folder.entity';
-import { IOHelper } from './../helpers/io.helper';    
+import { IOHelper } from './../helpers/io.helper';
 
 @Injectable()
 export class FolderService {
     constructor(
         @InjectRepository(FolderEntity)
-        private readonly folderRepository: Repository<FolderEntity>,
-        private readonly ioService: IOHelper
-    ) { }
+        private folderRepository: TreeRepository<FolderEntity>,
+        private readonly ioService: IOHelper,
+    ) {
+        this.folderRepository = getConnection().getTreeRepository(FolderEntity);
+    }
 
     async getFolder(folderId: string) {
-        const folder = await this.folderRepository.findOne({ where: { id: folderId } });
-        if (!folder) { throw new HttpException('folder not found!', 404); }
+        const folder = await this.folderRepository.findOne({
+            where: { id: folderId },
+        });
+        if (!folder) {
+            throw new HttpException('folder not found!', 404);
+        }
         return folder;
     }
 
@@ -30,25 +36,33 @@ export class FolderService {
     }
 
     async createFolder(folder: CreateFolderDto) {
+        let parentFolder, folderPath;
 
-        if (folder.parent !== undefined && folder.parent.id !== undefined) {
+        const entity = this.folderRepository.manager.create(FolderEntity, folder);
 
-            var parentFolder = await this.getFolder(folder.parent.id);
-            var addedFolder = await this.folderRepository.save(folder);
-            addedFolder.folderPath = parentFolder.folderPath + "/" + addedFolder.id;
-            var result = await this.folderRepository.save(addedFolder);
-
-            if (addedFolder && result) this.ioService.checkAndCreateNewFolder(result.folderPath);
+        const parentFolderId = folder?.parent?.id;
+        if (parentFolderId) {
+            parentFolder = await this.getFolder(parentFolderId);
         }
-        else {
 
-            var addedFolder = await this.folderRepository.save(folder);
-            addedFolder.folderPath = addedFolder.id;
-            result = await this.folderRepository.save(addedFolder);
+        let createdFolder = await this.folderRepository.save(entity);
 
-            if (addedFolder && result) this.ioService.checkAndCreateNewFolder(result.folderPath);
+        folderPath = createdFolder.id;
+        if (parentFolder)  {
+            folderPath = parentFolder.folderPath + '/' + folderPath;
         }
-        return result;
+
+        const updateResult = await this.folderRepository.update(
+            { id: createdFolder.id }, 
+            { folderPath }
+        );
+
+        if (updateResult.affected) {
+            this.ioService.checkAndCreateNewFolder(folderPath);
+            createdFolder = await this.folderRepository.findOne(createdFolder.id);
+        }
+
+        return createdFolder;
     }
 
     async updateFolder(toBeUpdatedFolderDto: UpdateFolderDto, folderId: string) {
@@ -60,12 +74,12 @@ export class FolderService {
         if (toBeUpdatedFolderDto.parent !== undefined && toBeUpdatedFolderDto.parent.id !== undefined) {
             var parentFolder = await this.getFolder(toBeUpdatedFolderDto.parent.id);
             folder.parent = toBeUpdatedFolderDto.parent;
-            folder.folderPath = parentFolder.folderPath + "/" + folder.id;
+            folder.folderPath = parentFolder.folderPath + '/' + folder.id;
         }
 
         var result = await this.folderRepository.save(folder);
         if (result) {
-            this.ioService.checkAndMoveFolder(tempPathForMoveProcess, folder.folderPath,)
+            this.ioService.checkAndMoveFolder(tempPathForMoveProcess, folder.folderPath);
         }
         return result;
     }
@@ -73,6 +87,5 @@ export class FolderService {
     async deleteFolder(folderId: string) {
         return await this.folderRepository.softDelete(folderId);
     }
+
 }
-
-

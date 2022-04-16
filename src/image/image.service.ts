@@ -1,21 +1,24 @@
-import { CreateImageDto } from '../models/image/image.dto';
 import { HttpException, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ImageEntity } from '../models/image/image.entity';
-import { IOHelper } from '../helpers/io.helper';    
+import { IOHelper } from '../helpers/io.helper';
+import { FolderService } from 'src/folder/folder.service';
 
 @Injectable()
 export class ImageService {
     constructor(
         @InjectRepository(ImageEntity)
         private readonly imageRepository: Repository<ImageEntity>,
-        private readonly ioService: IOHelper
-    ) { }
+        private readonly ioService: IOHelper,
+        private readonly folderService: FolderService,
+    ) {}
 
     async getImage(imageId: string) {
         const image = await this.imageRepository.findOne({ where: { id: imageId } });
-        if (!image) { throw new HttpException('image not found!', 404); }
+        if (!image) {
+            throw new HttpException('image not found!', 404);
+        }
         return image;
     }
 
@@ -29,50 +32,47 @@ export class ImageService {
         return await this.imageRepository.manager.getTreeRepository(ImageEntity).findDescendantsTree(image, { depth: depth ? depth : 1 });
     }
 
-    async createimage(image: CreateImageDto) {
+    async createImage(file, folderId) {
+        const willBeCreatedFileName = await this.ioService.willBeCreatedFileName(file.originalname, file.size);
+        const folder = await this.folderService.getFolder(folderId);
+        const imagePath = folder.folderPath + '/' + willBeCreatedFileName;
+        const fullStats = await this.ioService.writeImage(file, imagePath);
 
-        // if (image.parent !== undefined && image.parent.id !== undefined) {
-
-        //     var parentimage = await this.getImage(image.parent.id);
-        //     var addedimage = await this.imageRepository.save(image);
-        //     addedimage.imagePath = parentimage.imagePath + "/" + addedimage.id;
-        //     var result = await this.imageRepository.save(addedimage);
-
-        //     if (addedimage && result) this.ioService.checkAndCreateNewimage(result.imagePath);
-        // }
-        // else {
-
-        //     var addedimage = await this.imageRepository.save(image);
-        //     addedimage.imagePath = addedimage.id;
-        //     result = await this.imageRepository.save(addedimage);
-
-        //     if (addedimage && result) this.ioService.checkAndCreateNewimage(result.imagePath);
-        // }
-        // return result;
+        return await this.imageRepository.save({
+            folderId: folderId,
+            imageName: willBeCreatedFileName,
+            imageProperties: fullStats,
+            imagePath: imagePath,
+        });
     }
 
-    // async updateImage(toBeUpdatedimageDto: UpdateimageDto, imageId: string) {
-    //     var image = await this.getImage(imageId);
-    //     var tempPathForMoveProcess = image.imagePath;
-    //     image.imageName = toBeUpdatedimageDto.imageName ? toBeUpdatedimageDto.imageName : image.imageName;
-    //     image.updatedAt = new Date();
+    async updateImageV2(imageId: string, version) {
+        let imageObject = await this.getImage(imageId);
+        const { fullStats, updatedPathForObject } = await this.ioService.rotateImageAndWrite(imageObject.imagePath, version);
+        var updatedImageName = await this.ioService.willBeUpdatedFileName(imageObject.imageName, version)
+        return await this.imageRepository.save({
+            folderId: imageObject.folderId,
+            imageName: updatedImageName,
+            imageProperties: fullStats,
+            imagePath: updatedPathForObject,
+            parent: { id: imageObject.id },
+        });
+    }
 
-    //     if (toBeUpdatedimageDto.parent !== undefined && toBeUpdatedimageDto.parent.id !== undefined) {
-    //         var parentimage = await this.getImage(toBeUpdatedimageDto.parent.id);
-    //         image.parent = toBeUpdatedimageDto.parent;
-    //         image.imagePath = parentimage.imagePath + "/" + image.id;
-    //     }
+    async updateImageV3(imageId: string, version) {
+        let imageObject = await this.getImage(imageId);
+        const { fullStats, updatedPathForObject } = await this.ioService.rotateImageAndWrite(imageObject.imagePath, version);
+        var updatedImageName = await this.ioService.willBeUpdatedFileName(imageObject.imageName, version)
+        return await this.imageRepository.save({
+            folderId: imageObject.folderId,
+            imageName: updatedImageName,
+            imageProperties: fullStats,
+            imagePath: updatedPathForObject,
+            parent: { id: imageObject.id },
+        });
+    }
 
-    //     var result = await this.imageRepository.save(image);
-    //     if (result) {
-    //         this.ioService.checkAndMoveimage(tempPathForMoveProcess, image.imagePath,)
-    //     }
-    //     return result;
-    // }
-
-    async deleteimage(imageId: string) {
+    async deleteImage(imageId: string) {
         return await this.imageRepository.softDelete(imageId);
     }
 }
-
-
