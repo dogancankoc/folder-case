@@ -1,4 +1,13 @@
-import { Column, Entity, PrimaryGeneratedColumn, Tree, TreeChildren, TreeParent, DeleteDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { 
+  Column, 
+  Entity, 
+  PrimaryGeneratedColumn, 
+  Tree, TreeChildren, 
+  TreeParent, 
+  DeleteDateColumn, 
+  ManyToOne, 
+  JoinColumn 
+} from 'typeorm';
 import { FolderEntity } from '../folder/folder.entity';
 
 
@@ -50,9 +59,3 @@ export class ImageEntity {
   folder: FolderEntity
 
 }
-/*
-//TODO
-image ile folder ilişkisi kurulacak
-image description
-image uzantısı vs eklenecen
-*/

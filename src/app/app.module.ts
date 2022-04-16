@@ -19,8 +19,5 @@ import { ImageModule } from 'src/image/image.module';
       synchronize: true
     }),
     FolderModule, ImageModule]
-  //controllers: [folderController],
-  //providers: [folderService]
-  //exports : []
 })
 export class AppModule { }

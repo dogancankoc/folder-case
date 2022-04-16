@@ -1,12 +1,20 @@
-import { Get, Post, Put, Param, Body, Delete, Controller, UploadedFile, ParseUUIDPipe, UseInterceptors } from '@nestjs/common';
+import { 
+    Get, 
+    Post, 
+    Put, 
+    Param, 
+    Delete,
+    Controller, 
+    UploadedFile,
+    ParseUUIDPipe, 
+    UseInterceptors 
+} from '@nestjs/common';
 import { ImageService } from './image.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { FolderService } from 'src/folder/folder.service';
 
 @Controller('image')
 export class ImageController {
     constructor(private readonly imageService: ImageService, 
-        private readonly folderService: FolderService
         ) {}
 
     @Get('/:imageId')

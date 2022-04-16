@@ -1,5 +1,13 @@
+import { 
+  Column, 
+  Entity, 
+  PrimaryGeneratedColumn, 
+  Tree, TreeChildren, 
+  TreeParent, DeleteDateColumn, 
+  OneToMany, 
+  JoinColumn 
+} from 'typeorm';
 import { Exclude } from 'class-transformer';
-import { Column, Entity, PrimaryGeneratedColumn, Tree, TreeChildren, TreeParent, DeleteDateColumn, OneToMany, JoinColumn } from 'typeorm';
 import { ImageEntity } from '../image/image.entity';
 
 

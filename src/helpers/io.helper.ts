@@ -1,7 +1,7 @@
+const sharp = require('sharp');
 import { move } from 'fs-extra';
 import { access, mkdir } from 'fs';
 import { HttpException } from '@nestjs/common';
-const sharp = require('sharp');
 
 export class IOHelper {
     async checkAndCreateNewFolder(path) {

@@ -1,9 +1,9 @@
-import { CreateFolderDto, UpdateFolderDto } from '../models/folder/folder.dto';
-import { HttpException, Injectable } from '@nestjs/common';
-import { TreeRepository, getConnection, SelectQueryBuilder } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import { FolderEntity } from '../models/folder/folder.entity';
 import { IOHelper } from './../helpers/io.helper';
+import { InjectRepository } from '@nestjs/typeorm';
+import { TreeRepository, getConnection } from 'typeorm';
+import { HttpException, Injectable } from '@nestjs/common';
+import { FolderEntity } from '../models/folder/folder.entity';
+import { CreateFolderDto, UpdateFolderDto } from '../models/folder/folder.dto';
 
 @Injectable()
 export class FolderService {
